@@ -1,4 +1,7 @@
+//Jsoup Interface
 package jsoupinterface;
+
+//Import packages (Configured in module-info.java)
 import java.io.IOException;
 
 import org.jsoup.Jsoup;
@@ -21,37 +24,50 @@ import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 
+
+// Class with extend for JavaFX
 public class jsoupinterface extends Application {
+	// HTMLElement class: Creates a class to be implemented with observableArrayList
 	public static class HTMLElement {
+		// Class Attributes
 		private final String row;
 		private final String html;
-		
+		// HTMLElement Constructor
 		public HTMLElement(String row, String html) {
 			this.row = row;
 			this.html = html;
 		}
-		
+		// Functions to return the row as well as the HTML each
 		public String getrow() {return row;}
 		public String gethtml() {return html;}
 	}
+	    // Function override to set stage
 		@Override
 		public void start(Stage primaryStage) {
+			// Listview object with HTMLElement data type
 			ListView<HTMLElement> listView = new ListView<>();
+			// Set Cell Factory to allow proper observableArrayList compatibility
 			listView.setCellFactory(new Callback<ListView<HTMLElement>, ListCell<HTMLElement>>() {
+				// Call function with element adjustments
 				public ListCell<HTMLElement> call(ListView<HTMLElement> listView) {
 					return new ListCell<HTMLElement>() {
+						// HBox graphic
 						private final HBox graphic = new HBox(10);
+						// Labels
 						private final Label label1 = new Label();
 						private final Label label2 = new Label();
 						{
+							// Add the labels to the HBox and set width and height
 							graphic.getChildren().addAll(label1, label2);
 							label1.setPrefWidth(100);
 							label2.setPrefHeight(150);
 						}
-						
+						// Item Update override
 						@Override
 						protected void updateItem(HTMLElement item, boolean empty) {
+							// call super class
 							super.updateItem(item, empty);
+							// set empty text as null or set the text and HTML
 							if (empty || item == null) {
 								setGraphic(null);
 								setText(null);
@@ -64,40 +80,44 @@ public class jsoupinterface extends Application {
 					};
 				}
 			});
+			// Try-except: Primary Stage setup
 			try {
+				// Title set
 				primaryStage.setTitle("HTML data checker");
+				// Default: gets jsoup.org
 				Document doc = Jsoup.connect("http://jsoup.org").get();
+				// Select elements
 				Elements elements = doc.select("*");
-				int totalElements = elements.size();
-				System.out.println(totalElements);
-				//Element link = doc.select("a").first();
-				//String relHref = link.attr("href"); // == "/"
-				//String absHref = link.attr("abs:href"); // "http://jsoup.org/"
+				// Add Border and a scene with the border, instantiate pieces with
+				// Constructor functions and variable assignment
 				BorderPane border = new BorderPane();
 				Scene scene = new Scene(border,800,800);
 				TextArea textpiece = new TextArea();
 				ContextMenu contextMenu = new ContextMenu();
 				ObservableList<HTMLElement> items = FXCollections.observableArrayList();
 				int row = 1;
+				// ForEach loop: Add rows and HTML one after another
 				for (Element element : elements){
 					String elementString = element.html();
 					items.add(new HTMLElement(String.valueOf(row), elementString));
 					row ++;
 				}
+				// Set stage items
 				listView.setItems(items);
 				textpiece.setContextMenu(contextMenu);
 				TableView<HTMLElement> tableView = new TableView<>();
 				tableView.setItems(items);
 				border.setCenter(listView);
+				// Add CSS file to scene, set scene, show
 				scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 				primaryStage.setScene(scene);
 				primaryStage.show();
 			} catch(Exception e) {
-				e.printStackTrace();
+				e.printStackTrace(); //Exception
 			}
 		}
 		
 		public static void main(String[] args) throws IOException {
-			launch(args);
+			launch(args); //Runs whole JavaFX
 		}
 }
